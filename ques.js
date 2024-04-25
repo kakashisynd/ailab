@@ -3,53 +3,25 @@ const questions = [
     {
       question: "Aim:water jug",
       code: `
-  import random
-e={}
-l=[0,1]
-c=0
-loc=['a','b']
-e.update({'a':random.choice(l)})
-e.update({'b':random.choice(l)})
-i=random.choice(loc)
-print(e)
-print("vacum is at location",i)
-if(i=='a'):
-    if(e.get('a')==0):
-        print("A is clean")
-        print("Move to B")
-    else:
-        print("A is Dirty")
-        e.update({'a':0})
-        c=c+1
-        print("A is clean")
-        print("Move to B")
-    if(e.get('b')==0):
-            print("B is Clean")
-    else:
-        print("B is dirty")
-        e.update({'b':0})
-        c=c+1
-        print("B is clean")
-else:
-    if(e.get('b')==0):
-            print("B is Clean")
-            print("Move to A")
-    else:
-        print("B is dirty")
-        e.update({'b':0})
-        c=c+1
-        print("B is Clean")
-        print("Move to A")
-    if(e.get('a')==0):
-        print("A is clean")
-    else:
-        print("A is dirty")
-        e.update({'a':0})
-        c=c+1
-        print("A is clean")
-print("environment is clean")
-print(e)
-print("performance measure:",c)
+  def WaterJug(J1C,J2C,target):
+    j1=0
+    j2=0
+    while(j1!=target and j2!=target):
+        if(j1==0):
+            j1=J1C
+            print("Fill the Water in Jug1",j1,j2)
+        elif(j2==J2C):
+            j2=0
+            print("Empty Jug2",j1,j2)
+        else:
+            transfer=min(j1,J2C-j2)
+            j2+=transfer
+            j1-=transfer
+            print("Pour the Water from Jug1 to Jug2 ",j1,j2)
+J1C=int(input("Enter the Jug1 Capacity"))
+J2C=int(input("Enter Jug2 Capacity"))
+tar=int(input("Enter the Target amount"))
+WaterJug(J1C,J2C,tar)
 	`
     },
     {
