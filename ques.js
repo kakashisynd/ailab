@@ -1,29 +1,6 @@
 // Array of objects containing questions and their corresponding source codes
 const questions = [
-    {
-      question: "Aim:water jug",
-      code: `
-  def WaterJug(J1C,J2C,target):
-    j1=0
-    j2=0
-    while(j1!=target and j2!=target):
-        if(j1==0):
-            j1=J1C
-            print("Fill the Water in Jug1",j1,j2)
-        elif(j2==J2C):
-            j2=0
-            print("Empty Jug2",j1,j2)
-        else:
-            transfer=min(j1,J2C-j2)
-            j2+=transfer
-            j1-=transfer
-            print("Pour the Water from Jug1 to Jug2 ",j1,j2)
-J1C=int(input("Enter the Jug1 Capacity"))
-J2C=int(input("Enter Jug2 Capacity"))
-tar=int(input("Enter the Target amount"))
-WaterJug(J1C,J2C,tar)
-	`
-    },
+   
     {
       question: "Aim: vacum cleaner",
       code: `
