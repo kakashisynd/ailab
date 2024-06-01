@@ -80,13 +80,14 @@ WaterJug(J1C,J2C,tar)
     {
       question: "Aim:8 PUZZLE BFS",
       code: `
- from collections import deque
+from collections import deque
 
 # Class to represent the state of the puzzle
 class PuzzleState:
-    def __init__(self, puzzle, moves=0):
+    def __init__(self, puzzle, moves=0, parent=None):
         self.puzzle = puzzle
         self.moves = moves
+        self.parent = parent
 
     def __eq__(self, other):
         return self.puzzle == other.puzzle
@@ -112,7 +113,7 @@ class PuzzleState:
             if 0 <= new_i < 3 and 0 <= new_j < 3:
                 new_puzzle = [row[:] for row in self.puzzle]
                 new_puzzle[i][j], new_puzzle[new_i][new_j] = new_puzzle[new_i][new_j], new_puzzle[i][j]
-                neighbors.append(PuzzleState(new_puzzle, self.moves + 1))
+                neighbors.append(PuzzleState(new_puzzle, self.moves + 1, self))
         return neighbors
 
 # Breadth-First Search
@@ -123,7 +124,7 @@ def bfs(initial_state, goal_state):
     while queue:
         current_state = queue.popleft()
         if current_state == goal_state:
-             return current_state.moves, current_state
+            return current_state.moves, current_state
 
         visited.add(current_state)
         for neighbor in current_state.get_neighbors():
@@ -132,33 +133,39 @@ def bfs(initial_state, goal_state):
 
     return float('inf'), None
 
+def reconstruct_path(state):
+    path = []
+    while state:
+        path.append(state)
+        state = state.parent
+    path.reverse()  # Reverse the path to start from the initial state
+    return path
 
-initial_puzzle = [        [1, 2, 3],[8, 0, 4],[7, 6, 5]]
+# Example usage
+initial_puzzle = [
+    [1, 2, 3],
+    [8, 0, 4],
+    [7, 6, 5]
+]
 goal_puzzle = [
     [2, 8, 3],
     [1, 6, 4],
     [7, 0, 5]
 ]
-  
-"""initial_puzzle = [
-        [1, 0, 2],
-        [4, 5, 3],
-        [7, 8, 6]
-    ]
-  goal_puzzle = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 0]
-    ]"""
 
 initial_state = PuzzleState(initial_puzzle)
 goal_state = PuzzleState(goal_puzzle)
 moves, solution_state = bfs(initial_state, goal_state)
+
 if solution_state:
     print("Solution found in {} moves:".format(moves))
-    print(solution_state)
+    path = reconstruct_path(solution_state)
+    for step in path:
+        print(step)
+        print()
 else:
     print("No solution found.")
+
       `
     },
     {
@@ -231,67 +238,62 @@ find_path()
     {
       question: "Aim: A* ",
       code: `
-  G_m={'arad':366,'Bucharest':0,'Craiova':160,
-     'Drobeta':242,'Eforie':161,'Fagaras':176,
-     'Giurgiu':77,'Hirsova':151,'Iasi':226,
-     'Lugoj':244,'Neamt':234,'Oradea':380,
-     'Pitesti':100,'Rimnicu Vilcea':193,'Sibiu':253,
-     'Timisoara':329,'Urziceni':80,'Vaslui':199,
-     'Zerind':374,'mehadia':241
-    }
-A_m={
-     'arad'          :[['Zerind',75],        ['Timisoara',118],     ['Sibiu',140]],
-     'Bucharest'     :[['Pitesti',101],      ['Fagaras',211]],  
-     'Craiova'       :[['Pitesti',138],      ['Rimnicu Vilcea',146],['Drobeta',120]],
-     'Drobeta'       :[['Craiova',120],      ['mehadia',75]],
-     'Fagaras'       :[['Bucharest',211],    ['Sibiu',99]],
-     'Lugoj'         :[['mehadia',70],       ['Timisoara',111]],
-     'Oradea'        :[['Zerind',71],        ['Sibiu',151]],
-     'Pitesti'       :[['Rimnicu Vilcea',97],['Bucharest',101]],
-     'Rimnicu Vilcea':[['Pitesti',97],       ['Sibiu',80],          ['Craiova',146]],
-     'Sibiu'         :[['arad',140],         ['Fagaras',99],        ['Oradea',151]],
-     'Timisoara'     :[['arad',118],         ['Lugoj',111]],
-     'Zerind'        :[['arad',75],          ['Oradea',71]],
-     'mehadia'       :[['Lugoj',70],         ['Drobeta',75]],
-     'Neamt'         :[['Iasi',87]],
-     'Iasi'          :[['Neamt',87],         ['Vaslui',92]],
-     'Vaslui'        :[['Urziceni',142]],
-     'Urziceni'      :[['Vaslui',142],       ['Hirsova',98],        ['Bucharest',85]],
-     'Hirsova'       :[['Urziceni',98],      ['Eforie',86]],
-     'Eforie'        :[['Hirsova',86]]
-    }
-def find_next(ps,cost):
-    k=A_m[ps]
-    m=G_m[k[0][0]]+cost
-    ns=0
-    for i in range(1,len(k)):
-        if(G_m[k[i][0]]+cost<m):
-            m=G_m[k[i][0]]+cost
-            ns=i
-    return ns
-def find_path():
-    i_s=input("enter :")
-    print("initial state:",i_s)
-    path=[]
-    cost=0
-    path.append(i_s)
-    j=find_next(i_s,cost)
-    k=A_m[i_s]
-    cost=cost+k[j][1]
-    path.append(k[j][0])
-    n=len(path)
-    i_s = k[j][0]
-    while(path[n-1]!= 'Bucharest' ):
-            j=find_next(i_s,cost)
-            k=A_m[i_s]
-            cost=cost+k[j][1]
-            i_s = k[j][0]
-            path.append(k[j][0])
-            n=len(path)
-    print(path)
-    print("cost :",cost)
-find_path()
+ import heapq
 
+# Define the graph and the heuristic values
+g = {
+    'A': {'B': 1, 'C': 4},
+    'B': {'C': 2, 'D': 5},
+    'C': {'D': 1},
+    'D': {'E': 3},
+    'E': {}
+}
+
+heuristic = {
+    'A': 7,
+    'B': 6,
+    'C': 2,
+    'D': 1,
+    'E': 0
+}
+
+# A* algorithm implementation
+def a_star(graph, heuristic, start, goal):
+    open_list = [(heuristic[start], start, [])]  # (estimated_cost, current_city, path)
+    heapq.heapify(open_list)
+    closed_list = set()
+
+    while open_list:
+        _, current, path = heapq.heappop(open_list)
+        
+        if current in closed_list:
+            continue
+
+        path = path + [current]
+
+        if current == goal:
+            return path
+
+        closed_list.add(current)
+
+        for neighbor, weight in graph[current].items():
+            if neighbor not in closed_list:
+                estimated_cost = weight + heuristic[neighbor]
+                heapq.heappush(open_list, (estimated_cost, neighbor, path))
+
+    return None
+
+# User inputs
+start = input("Enter the Starting City Name: ").strip().upper()
+dest = input("Enter the Destination City Name: ").strip().upper()
+
+# Find the path
+path = a_star(g, heuristic, start, dest)
+
+if path:
+    print("Path is", path)
+else:
+    print("There is no path")
       `
     },
     {
